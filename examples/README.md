@@ -17,3 +17,5 @@ Terraform Oracle Cloud Infrastructure Provider Examples
   [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/subraman1an-vv/magic-button-examples/releases/latest/download/apm.zip)
 - appmgmt_control  
   [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/subraman1an-vv/magic-button-examples/releases/latest/download/appmgmt_control.zip)
+- artifacts  
+  [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/subraman1an-vv/magic-button-examples/releases/latest/download/artifacts.zip)
