@@ -54,13 +54,12 @@ jobs:
         pip install markdown
         markdown_py pages/README.md > pages/index.html
         cp pages/README.md ./examples/README.md
-        cp pages/index.html ./index.html
         
     - name: Commit and Push Changes
       run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "action@github.com"
-          git add ./examples/* ./index.html 
+          git add ./examples/*
           git commit -m "Update examples markdown and html files"
           git push
           
