@@ -1,0 +1,43 @@
+name: Update overview with magic button
+
+on:
+  push:
+    branches: [ main ]
+    paths: ['content/**/**']
+
+jobs:
+
+  update_overview_content:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Update files
+      id: update_files
+      run: |
+        FOLDERS=$(ls -d examples/*/ | jq -R)
+        for example_folder in $FOLDERS;
+        do
+          resource=$(cut -d "/" -f 2 <<< "$example_folder")
+          MAGIC_LINK="https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/releases/latest/download/"
+          filename=${resource}.md
+          filezip=${resource}.zip
+          printf '%s\n' '# Overview' > ./examples/${resource}/README.md
+          cat ./content/$filename >> ./examples/${resource}/README.md
+          printf '%s\n' '- '${resource}'  
+          [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
+        done
+
+    - name: Commit and Push Changes
+      run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "action@github.com"
+            git pull origin main
+            git add ./examples/*
+            git commit -m "Update README.md of examples"
+            git push
+          else
+            echo "No changes!";
+          fi
