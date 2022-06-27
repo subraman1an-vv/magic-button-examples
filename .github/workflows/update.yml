@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  update_overview_content:
+  update_overview:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -25,8 +25,7 @@ jobs:
           filezip=${resource}.zip
           printf '%s\n' '# Overview' > ./examples/${resource}/README.md
           cat ./content/$filename >> ./examples/${resource}/README.md
-          printf '%s\n' '- '${resource}'  
-          [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
+          printf '\n## Magic Button \n[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
         done
 
     - name: Commit and Push Changes
