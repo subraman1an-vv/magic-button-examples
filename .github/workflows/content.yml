@@ -3,7 +3,7 @@ name: Create markdown files
 on:
   push:
     branches: [ main ]
-    paths: ['content/**/**']
+    paths: ['examples/**/**']
 
 jobs:
 
