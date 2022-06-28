@@ -13,6 +13,35 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Create files
+      id: create_files
+      run: |
+        FOLDERS=$(ls -d examples/*/ | jq -R)
+        for example_folder in $FOLDERS;
+        do
+          resource=$(cut -d "/" -f 2 <<< "$example_folder")
+          filename=${resource}.md
+          if [ -f "./examples/$resource/$filename" ]; then
+            echo "$filename exists."
+          else
+            touch ./examples/${resource}/${filename}
+            echo "$filename created."
+          fi
+        done
+
+    - name: Commit and Push Changes
+      run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "action@github.com"
+            git pull origin main
+            git add ./examples/*
+            git commit -m "Add markdown files"
+            git push
+          else
+            echo "No changes!";
+          fi
+
     - name: Prepare Index Examples
       run: |
         mkdir -p pages/examples
@@ -28,15 +57,20 @@ jobs:
         for example_folder in $FOLDERS;
         do
           resource=$(cut -d "/" -f 2 <<< "$example_folder")
-          filename=${resource}.zip
+          MAGIC_LINK="https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/releases/latest/download/"
+          filename=${resource}.md
+          filezip=${resource}.zip
+          printf '%s\n' '# Overview' > ./examples/${resource}/README.md
+          cat ./examples/${resource}/$filename >> ./examples/${resource}/README.md
+          printf '\n## Magic Button \n[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
           folder=$(echo "$example_folder" | tr -d '"')
           echo "::group::Processing $resource"
-          zip -r $filename $folder || { printf '\n⛔ Unable to create %s stack.\n'; exit 1;  }
+          zip -r $filezip $folder || { printf '\n⛔ Unable to create %s stack.\n'; exit 1;  }
           echo "::endgroup::"
-          ASSETS+="-a ${filename} "
-          cp $filename pages/examples/
+          ASSETS+="-a ${filezip} "
+          cp $filezip pages/examples/
           printf '%s\n' '- '${resource}'  
-          [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filename}')' >> pages/README.md
+          [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >> pages/README.md
         done
         echo "::set-output name=assets::$ASSETS"
     
@@ -53,16 +87,16 @@ jobs:
         
     - name: Commit and Push Changes
       run: |
-         if [ -n "$(git status --porcelain)" ]; then
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "action@github.com"
-            git pull origin main
-            git add ./examples/*
-          git commit -m "Update examples markdown and html files"
+        if [ -n "$(git status --porcelain)" ]; then
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "action@github.com"
+          git pull origin main
+          git add ./examples/*
+          git commit -m "Update README.md"
           git push
-          else
-            echo "No changes!";
-          fi
+        else
+          echo "No changes!";
+        fi
           
     - name: Publish to Github Pages
       uses: peaceiris/actions-gh-pages@v3
