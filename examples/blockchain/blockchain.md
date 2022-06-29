@@ -1,0 +1,5 @@
+Oracle Blockchain Platform gives you a pre-assembled platform for building and running smart contracts and maintaining a tamper-proof distributed ledger.
+
+Oracle Blockchain Platform is a network consisting of validating nodes (peers) that update the ledger and respond to queries by executing smart contract code—the business logic that runs on the blockchain. External applications invoke transactions or run queries through client SDKs or REST API calls, which prompts selected peers to run the smart contracts. Multiple peers endorse (digitally sign) the results, which are then verified and sent to the ordering service. After consensus is reached on the transaction order, transaction results are grouped into cryptographically secured, tamper-proof data blocks and sent to peer nodes to be validated and appended to the ledger. Service administrators can use the Oracle Blockchain Platform web console to configure the blockchain and monitor its operation.
+
+With Oracle Blockchain Platform, you complete some simple instance creation steps, and then Oracle takes care of service management, patching, backup and restore, and other service lifecycle tasks.
