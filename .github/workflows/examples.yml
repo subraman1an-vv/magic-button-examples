@@ -44,9 +44,9 @@ jobs:
 
     - name: Prepare Index Examples
       run: |
-        mkdir -p pages/examples
-        printf '%s\n' 'Terraform Oracle Cloud Infrastructure Provider Examples' > pages/README.md
-        printf '%s\n' '' '[magic_button]: https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg' >>pages/README.md
+        mkdir -p examples/zips
+        printf '%s\n' 'Terraform Oracle Cloud Infrastructure Provider Examples' > examples/README.md
+        # printf '%s\n' '' '[magic_button]: https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg' >> examples/README.md
     
     - name: Create stacks
       id: create_stacks
@@ -58,32 +58,34 @@ jobs:
         do
           resource=$(cut -d "/" -f 2 <<< "$example_folder")
           MAGIC_LINK="https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/releases/latest/download/"
-          filename=${resource}.md
-          filezip=${resource}.zip
-          printf '%s\n' '# Overview' > ./examples/${resource}/README.md
-          cat ./examples/${resource}/$filename >> ./examples/${resource}/README.md
-          printf '\n## Magic Button \n[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
-          folder=$(echo "$example_folder" | tr -d '"')
-          echo "::group::Processing $resource"
-          zip -r $filezip $folder || { printf '\n⛔ Unable to create %s stack.\n'; exit 1;  }
-          echo "::endgroup::"
-          ASSETS+="-a ${filezip} "
-          cp $filezip pages/examples/
-          printf '%s\n' '- '${resource}'  
-          [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >> pages/README.md
+          echo "$resource";
+          if [[ "$resource" != "zips" ]]; then
+            filename=${resource}.md
+            filezip=${resource}.zip
+            cat ./examples/${resource}/$filename > ./examples/${resource}/README.md
+            printf '\n## Magic Button \n[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >>./examples/${resource}/README.md
+            folder=$(echo "$example_folder" | tr -d '"')
+            echo "::group::Processing $resource"
+            zip -r $filezip $folder || { printf '\n⛔ Unable to create %s stack.\n'; exit 1;  }
+            echo "::endgroup::"
+            # ASSETS+="-a ${filezip} "
+            cp $filezip examples/zips
+            printf '%s\n' '- '${resource}'  
+            [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)]('${MAGIC_LINK}${filezip}')' >> examples/README.md
+          fi
         done
         echo "::set-output name=assets::$ASSETS"
     
-    - name: Create Release
-      run: hub release create ${{ steps.create_stacks.outputs.assets }} -F pages/README.md $(date +%Y%m%d%H%M%S)
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Create Release
+    #   run: hub release create ${{ steps.create_stacks.outputs.assets }} -F pages/README.md $(date +%Y%m%d%H%M%S)
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Generate Index for Github Pages
-      run: |
-        pip install markdown
-        markdown_py pages/README.md > pages/index.html
-        cp pages/README.md ./examples/README.md
+    # - name: Generate Index for Github Pages
+    #   run: |
+    #     pip install markdown
+    #     markdown_py pages/README.md > pages/index.html
+    #     cp pages/README.md ./examples/README.md
         
     - name: Commit and Push Changes
       run: |
@@ -92,15 +94,15 @@ jobs:
           git config --global user.email "action@github.com"
           git pull origin main
           git add ./examples/*
-          git commit -m "Update README.md"
+          git commit -m "Updates"
           git push
         else
           echo "No changes!";
         fi
           
-    - name: Publish to Github Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: pages
+    # - name: Publish to Github Pages
+    #   uses: peaceiris/actions-gh-pages@v3
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_branch: gh-pages
+    #     publish_dir: pages
