@@ -90,8 +90,8 @@ jobs:
     - name: Commit and Push Changes
       run: |
         if [ -n "$(git status --porcelain)" ]; then
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "action@github.com"
+          git config --global user.name "Subramanian V V"
+          git config --global user.email "subramanian.v.v@oracle.com"
           git pull origin main
           git add ./examples/*
           git commit -m "Updates"
